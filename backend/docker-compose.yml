@@ -1,0 +1,32 @@
+# Heroes Tracker backend on bastion (or any Linux/Jetson/Pi box).
+#
+#   cp .env.example .env     # then edit: HEROESPROFILE_API_TOKEN, HEROESPROFILE_RANK_TIER
+#   docker compose up -d --build
+#
+# Open http://<host>:3001/api/version to confirm it's up. All state lives
+# under ./data on the host (the SQLite cache — easy to back up or wipe to
+# force a full HeroesProfile resync).
+#
+# Port 3001 assumes Remndrs already owns 3000 on this box (see bastion's
+# cloudflared config.yml port registry) — bump it here and in .env if 3001 is
+# already taken by something else.
+services:
+  heroes-tracker:
+    build: .
+    image: heroes-tracker:latest
+    container_name: heroes-tracker
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    volumes:
+      - ./data:/app/data      # SQLite cache (heroes-tracker.db)
+      - ./.env:/app/.env      # HeroesProfile token + settings
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:3001/api/version')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
