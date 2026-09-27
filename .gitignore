@@ -1,0 +1,17 @@
+# Backend (Python/Flask)
+backend/.env
+backend/data/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Frontend (Vite/React)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# OS/editor
+.DS_Store
